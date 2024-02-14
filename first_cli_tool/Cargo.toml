@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["Victor Cornille <victor.bolheme@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "A tool to search files"
-readme = "README.md"
 homepage = "https://github.com/TheSacredConqueror"
 repository = "https://github.com/TheSacredConqueror/Rust_Is_Great/first_cli_tool"
 keywords = ["cli", "search", "demo"]
