@@ -1,5 +1,20 @@
 // TODO: Create the `curry!()` macro.
 
+macro_rules! curry {
+	(($arg:ident: $ty:ty) => ($($rest:tt)*) $body:block) => {
+        |$arg: $ty| {
+            print_curried_argument($arg);
+            curry!(($($rest)*), $body)
+        }
+    };
+    (($arg:ident: $ty:ty) => _, $body:block) => {
+        |$arg: $ty| {
+            print_curried_argument($arg);
+            $body
+        }
+    };	
+}
+
 ////////// DO NOT CHANGE BELOW HERE /////////
 
 fn print_numbers(nums: &Vec<i32>) {
