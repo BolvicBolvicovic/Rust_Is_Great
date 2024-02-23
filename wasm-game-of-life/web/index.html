@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Little Game of Life!</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="flex justify-center flex-col grid">
+	<div class="text-2xl font-bold text-fuchsia-900 text-center pt-5">
+		<h1 class="text-5xl">Welcome to the Game of Life !</h1><br>
+		<p class="font-medium">-- 🦀 made in rust and wasm 🦀 --</p><br>
+	</div>
+    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+	<div class="flex-none">
+		<canvas id="game-of-life-canvas"></canvas>
+		<script src="./bootstrap.js"></script>
+	</div>
+  </body>
+</html>
