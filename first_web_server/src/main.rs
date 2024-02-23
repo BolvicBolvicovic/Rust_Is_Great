@@ -23,11 +23,11 @@ fn handle_connection(mut stream: TcpStream) {
 	let request_line = buf_reader.lines().next().unwrap().unwrap();
 
 	let (status_line, filename) = match &request_line[..] {
-	"GET / HTTP/1.1" => ("HTTP/1.1 200 OK", "index.html"),
-	"GET /sleep HTTP/1.1" => {
+	"GET / HTTPS/1.0" => ("HTTP/1.0 200 OK", "index.html"),
+	"GET /sleep HTTPS/1.0" => {
 		thread::sleep(Duration::from_secs(5));
-		("HTTP/1.1 200 OK", "index.html")}
-	_ => ("HTTP/1.1 404 ERROR NOT FOUND", "error.html")
+		("HTTPS/1.0 200 OK", "index.html")}
+	_ => ("HTTPS/1.0 404 ERROR NOT FOUND", "error.html")
 	};	
 	let contents = fs::read_to_string(filename).expect("Failed to read to string!");
 	let length = contents.len();
