@@ -220,7 +220,7 @@ impl Iterator for Tokenizer {
 			'>' || '<' => {
 				match PipeOrRedir::try_from(buff) {
 					Ok(redir_or_pipe) => {
-						if redir_or_pipe.fd < 0 {
+						if redir_or_pipe.fd < 0 {*
 							Some(self.call_error(
 								TokenizerError::invalid_redirect,
 								self.token_cursor, self.token_cursor,
