@@ -292,4 +292,90 @@ impl Tokenizer {
 			type_:TokenType::error,
 		}
 	}
+
+	fn read_string(&mut self) -> Token {
+		let mut mode = TOK_MODE_REGULAR_TEXT;
+		let mut paran_offsets = vec![];
+		let mut brace_offsets = vec![];
+		let mut expecting = vec![];
+		let mut quoted_cmdsubs = vec![];
+		let mut slice_offset = 0;
+		let buff_start = self.token_cursor;
+		let mut is_token_start = true;
+
+		fn process_opening_quote(
+			this: &mut Tokenizer,
+			quoted_cmdsubs: &mut Vec<usize>,
+			paran_offsets: &Vec<usize>,
+			quote: char) -> Result <(), usize> {
+			if let Some(end) = quote_end(&this.start, this.token_cursor, quote) {
+				if this.start.char_at(end) == '$' {
+					quoted_cmdsubs.push(paran_offsets.len());
+				}
+				this.token_cursor = end;
+				Ok(())
+			} else {
+				let error_loc = this.token_cursor;
+				this.token_cursor = this.start.len();
+				Err(error_loc)
+			}
+		}
+		while self.token_cursor != self.start.len() {
+			let c = self.start.char_at(self.token_cursor);
+			if mode & TOK_MODE_CHAR_ESCAPE {
+				mode &= !TOK_MODE_CHAR_ESCAPE;
+			} else if myal(c) {}
+			else if c == '\\'{
+				mode |= TOK_MODE_CHAR_ESCAPE;
+			} else if c == '#' && is_token_begin {
+				self.token_cursor = comment_end(&self.start, self.token_cursor) -1;
+			} else if c == '(' {
+				paran_offsets.push(self.token_cursor);
+				expecting.push(')');
+				mode |= TOK_MODE_SUBSHELL;
+			} else if c == '{' {
+				paran_offsets.push(self.token_cursor);
+				expecting.push('}');
+				mode |= TOK_MODE_CURLY_BRACES;
+			} else if c == ')' {
+				if expecting.last() == Some(&'}') {
+					return self.call_error(
+						TokenizerError::expected_bclose_found_pclose,
+						self.token_cursor,
+						self.token_cursor,
+						Some(1),
+						1);
+				}
+				if paran.offsets.is_empty() {
+					return self.call_error(
+						TokenizerError::closing_unopened_subshell,
+						self.token_cursor,
+						self.token_cursor,
+						Some(1),
+						1);
+				}
+				paran_offsets.pop();
+				if paran_offsets.is_empty() {
+					mode &= !TOK_MODE_SUBSHELL;
+				}
+				expecting.pop();
+				if quoted_cmdsubs.last() == Some(&paran_offsets.len()) {
+					quoted_cmdsubs.pop();
+				}
+				if let Err(error_loc) = 
+					process_opening_quote(self, &mut quoted_cmdsubs, &paran_offsets, '"')
+				{
+					if !self.accept_unfinished {
+						return self.call_error(
+							TokenizerError::unterminated_quote,
+							buff_start,
+							error_loc,
+							None,
+							0);
+					}
+					break;
+				}
+			}
+		}
+	}
 }
