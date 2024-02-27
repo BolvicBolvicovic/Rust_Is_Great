@@ -24,31 +24,102 @@ impl Action {
 	}
 
 	fn use_item(game: &mut Game) {
-		self.show_items(&game.player);
-		print_epic("\nChoisis l'item a utilise via son index.\nSi tu ne veux pas utiliser un item, appuie sur entre.\n");
-		let prompt = game.get_prompt();
-		match prompt.as_str().next() {
-			Some('0') => {
-				let item = game.player.items.remove(0);
-				match item {
+		fn match_item(item: Item) {
+			match item {
+					Item::UnknownPostion	|
 					Item::HeavyHealthPotion	|
 					Item::HeavyPoison		|
 					Item::MediumHealthPotion|
 					Item::MediumPoison		|
 					Item::LightHealthPotion	|
 					Item::LightPoison 		=> item.drink(game.player);
+					Item::SmallKey			|
+					Item::MediumKey			|
+					Item::LongKey			=> item.try_use(game.player);
+			}		
+		}
+
+		self.show_items(&game.player);
+		print_epic("\nChoisis l'item a utilise via son index.\nSi tu ne veux pas utiliser un item, appuie sur entre.\n");
+		let prompt = game.get_prompt();
+		match prompt.as_str().next() {
+			Some('0') => {
+				let item = game.player.items.remove(0);
+				match_item(item);
+			}
+			Some('1')	=> {
+				if game.player.items.len() > 0 {
+					let item = game.player.items.remove(1);
+					match_item(item);
+				} else {
+					print_epic("There is no object at index 1.\n");
 				}
 			}
-			Some('1')	=> {}
-			Some('2')	=> {}
-			Some('3')	=> {}
-			Some('4')	=> {}
-			Some('5')	=> {}
-			Some('6')	=> {}
-			Some('7')	=> {}
-			Some('8')	=> {}
-			Some('9')	=> {}
-			None		=> {}
+			Some('2')	=> {
+				if game.player.items.len() > 1 {
+					let item = game.player.items.remove(2);
+					match_item(item);
+				} else {
+					print_epic("There is no object at index 2.\n");
+				} 
+			}
+			Some('3')	=> {
+				if game.player.items.len() > 2 {
+					let item = game.player.items.remove(3);
+					match_item(item);
+				} else {
+					print_epic("There is no object at index 3.\n");
+				} 
+			}
+			Some('4')	=> {
+				if game.player.items.len() > 3 {
+					let item = game.player.items.remove(4);
+					match_item(item);
+				} else {
+					print_epic("There is no object at index 4.\n");
+				} 
+			}
+			Some('5')	=> {
+				if game.player.items.len() > 4 {
+					let item = game.player.items.remove(5);
+					match_item(item);
+				} else {
+					print_epic("There is no object at index 5.\n");
+				} 
+			}
+			Some('6')	=> {
+				if game.player.items.len() > 5 {
+					let item = game.player.items.remove(6);
+					match_item(item);
+				} else {
+					print_epic("There is no object at index 6.\n");
+				} 
+			}
+			Some('7')	=> {
+				if game.player.items.len() > 6 {
+					let item = game.player.items.remove(7);
+					match_item(item);
+				} else {
+					print_epic("There is no object at index 7.\n");
+				} 
+			}
+			Some('8')	=> {
+				if game.player.items.len() > 7 {
+					let item = game.player.items.remove(8);
+					match_item(item);
+				} else {
+					print_epic("There is no object at index 8.\n");
+				} 
+			}
+			Some('9')	=> {
+				if game.player.items.len() > 8 {
+					let item = game.player.items.remove(9);
+					match_item(item);
+				} else {
+					print_epic("There is no object at index 9.\n");
+				} 
+			}
+			None | Some(_)	=> { }
 		}
 	}
 }
@@ -112,7 +183,7 @@ impl Item {
 		}
 	}
 
-	/*fn use(target: &mut Item) {
+	/*fn try_use(target: &mut Item) {
 		match self {
 			
 		}
@@ -124,6 +195,7 @@ pub struct Player {
 	pub health: i16,
 	pub is_dead: bool,
 	pub items: Vec<Item>,
+//TODO Make a list for the item you know (which means if you don't know it you have to try it first)
 }
 
 impl Player {
