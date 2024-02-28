@@ -36,11 +36,13 @@ impl Action {
 					Item::SmallKey			|
 					Item::MediumKey			|
 					Item::LongKey			=> item.try_use(game.player);
-			}		
+					Item::Dagger			=> item.try_break(game.player);
+					_						=> print_epic("You cannot use this item.\n");
+			}
 		}
 
 		self.show_items(&game.player);
-		print_epic("\nChoisis l'item a utilise via son index.\nSi tu ne veux pas utiliser un item, appuie sur entre.\n");
+		print_epic("\nChoisis l'item à utilise via son index.\nSi tu ne veux pas utiliser un item, appuie sur entré.\n");
 		let prompt = game.get_prompt();
 		match prompt.as_str().next() {
 			Some('0') => {
@@ -137,24 +139,24 @@ pub enum Item {
 	MediumKey,
 	LongKey,
 	Dagger,
-	Dart,
+	Chest(Lock: &str),
 }
 
 impl Item {
 	fn drink_potion(&mut self, hp: i16, player: &mut Player, potion_type: &str) {
 		match player.health {
-			100 => { println!(
-				"You are drinking a {} potion... But it does not do anything.", potion_type); }
+			100 => { print_epic(format!(
+				"You are drinking a {} potion... But it does not do anything.", potion_type)); }
 			_ => {
-				println!(
-				"You are drinking a {} potion... And it makes you feel a tiny bit better.", potion_type); }
+				print_epic(format!(
+				"You are drinking a {} potion... And it makes you feel a tiny bit better.", potion_type)); }
 		}
 		player.health += hp;
 		if player.health > 100 { player.health = 100; }
 	}
 	
 	fn drink_poison(&mut self, hp: i16, player: &mut Player, poison_type: &str) {
-		println!("You are drinking a {} poison... And it makes you feel worse.", poison_type);
+		print_epic(format!("You are drinking a {} poison... And it makes you feel worse.", poison_type));
 		player.health -= hp;
 		if player.health > 0 { player.is_dead = true; }
 	}
@@ -182,18 +184,33 @@ impl Item {
 			_ => { println!("You cannot drink this item !"); }
 		}
 	}
+//TODO: finish these two methods
+	fn try_use(player: &mut Player) {
+		if player.has_chest == true {
+			for i in 0..player.items.len() {
+				if player.items[i] == Item::Chest("LargeKey") {
 
-	/*fn try_use(target: &mut Item) {
-		match self {
-			
+				} else if player.items[i] == Item::Chest("MediumKey") {
+
+				} else if player.items[i] == Item::Chest("SmallKey") {
+
+				}
+			}
+		} else {
+			print_epic("You do not have any chest to open.");
 		}
-	}*/
+	}
+
+	fn try_break(player: &mut Player) {
+		
+	}
 }
 
 pub struct Player {
 	pub coins: i16,
 	pub health: i16,
 	pub is_dead: bool,
+	pub has_chest: bool,
 	pub items: Vec<Item>,
 //TODO Make a list for the item you know (which means if you don't know it you have to try it first)
 }
@@ -204,6 +221,7 @@ impl Player {
 			coins: 0,
 			health: 5,
 			is_dead: false,
+			has_chest: false,
 			items: vec![],
 		}
 	}
@@ -211,7 +229,9 @@ impl Player {
 	fn add_item(&mut self, item: Item) {
 		if self.items.len() < 11 {
 			self.items.push(item);
-		}
+		} else {
+			print_epic("Your bag is full, you cannot carry more items.");
+		} 
 	}
 
 	fn get_item_index(&mut self, item: &Item) -> i16 {
@@ -223,7 +243,14 @@ impl Player {
 			}
 		}
 		index
-	} 
+	}
+
+	fn monitor_hp(&self) {
+		if self.is_dead == true {
+			print_epic("\nTU ES MORT.\n");
+			exit(1);
+		}
+	}
 }
 
 pub fn wait(time: i16) {
@@ -324,6 +351,7 @@ Tu te sens faible.");
 				Some(Action::SearchRoom)			=> { action.search_room(self.player);			}
 				None								=> { continue;									}
 			}
+			self.monitor_hp();
 			if self.iteration == 10 { println!("You survived the whole game"); break; }
 		}
 	}
