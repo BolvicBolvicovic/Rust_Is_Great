@@ -21,19 +21,20 @@ impl File {
 	fn new(filename: &str) -> File {
 		let mut my_imgs = Vec::new();
 		let cont = fs::read(filename).expect("Should be able to read file.");
-
+        let mut i = 0;
 
 		if filename.find("image").is_some() {
 			let n_img	= bytes_to_i32(&cont[4..=7]);
 			let n_r		= bytes_to_i32(&cont[8..=11]);
 			let n_c		= bytes_to_i32(&cont[12..=15]);
 			
-			for img_idx in 0..n_img {
+			for _img_idx in 0..n_img {
 				let mut image = Vec::new();
-				for row_idx in 0..n_r {
+				for _row_idx in 0..n_r {
 					let mut row = Vec::new();
-					for col_idx in 0..n_c {
-						row.push(cont[img_idx * row_idx * col_idx + 16]);
+					for _col_idx in 0..n_c {
+						row.push(cont[i + 16]);
+                        i += 1;
 					}
 					image.push(row);
 				}
@@ -55,7 +56,8 @@ impl File {
 }
 
 fn main() {
-	let data_img = File::new(&DATA_FILENAME_IMG);
-	let data_lab = File::new(&DATA_FILENAME_LAB);
-	data_img.print_struct();
+	let x_test  = File::new(&DATA_FILENAME_IMG);
+	let y_test  = File::new(&DATA_FILENAME_LAB);
+    let x_train = File::new(&DATA_FILENAME_IMG);
+    let y_train = File::new(&DATA_FILENAME_LAB);
 }
