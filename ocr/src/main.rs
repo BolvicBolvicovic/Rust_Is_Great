@@ -100,11 +100,63 @@ impl 	File {
 	}
 }
 
+pub fn zip(x: Vec<u8>, y: Vec<u8>) -> Result<Vec<(u8, u8)>, ()> {
+	if x.len() != y.len() { return Err(())}
+	let mut zipped = Vec::new();
+	for i in 0..x.len() {
+		zipped.push((x[i], y[i]));
+	}
+	zipped
+}
+
+pub fn dist(x: Vec<u8>, y: Vec<u8>) -> u16 {
+	let mut distance = 0;
+	let zipped = zip(x, y).expect("Lists do not have the same length.");
+	for (x_i, y_i) in zipped.to_iter() {
+		distance += (x_i - y_i).pow(2);
+	}
+	distance.sqrt()
+}
+
+
+pub fn get_training_distances_for_test_sample(x_train: Vec<Vec<u8>>,
+											  test_sample: Vec<u8>)
+											  -> Vec<u8> {
+	let mut distances = Vec::new();
+	for train_sample in x_train.to_iter() {
+		distances.push(dist(train_sample.unwrap(), &test_sample));
+	}
+	distances
+}
+
+pub fn enumerate(simple_vector: Vec<u8>) -> Vec<(u8, u8)> {
+	let mut vec_enumerated = Vec::new();
+	for i in 0..simple_vector.len() {
+		vec_enumerated.push((simple_vector[i], i));
+	}
+	vec_enumerated
+}
+
+pub fn sort_and_return_indices(_vec: Vec<(u8, u8)>) -> Vec<u8> {
+	let mut indices = Vec::new();
+	//TODO: finish the function by sorting y based on x
+	for (_x, y) in _vec.to_iter() {
+		indices.push(y);
+	}
+	Vec::from(*indices.sort())
+}
+
 pub fn	k_nearest_neighbours(x_train: Vec<Vec<u8>>	,
 							 y_train: Vec<u8>>		,
 							 x_test : Vec<Vec<u8>>	,
-							 y_test : Vec<<u8>>		) {
-
+							 k		: u8) -> Vec<u8> {
+	let mut y_prediction = Vec::new();
+	for sample in x_train.to_iter() {
+		let training_distances = get_training_distances_for_test_sample(&x_train, sample);
+		let sorted_distance_indices = sort_and_return_indices(enumerate(training_distances));
+		y_prediction.push();
+	}
+	y_prediction
 }
 
 fn	main() {
