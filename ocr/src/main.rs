@@ -58,8 +58,8 @@ impl 	File {
 				my_imgs.push(image);
 			}
 		} else {
-			let mut v1 = Vec::from(&cont[8..]);
- 			let mut v2 = Vec::new();
+			let v1		= Vec::from(&cont[8..]);
+ 			let mut v2	= Vec::new();
 			v2.push(v1);
 			my_imgs.push(v2);
 		}
@@ -80,7 +80,7 @@ impl 	File {
 				let mut result	= Vec::new();
 				for _img in 0..n_img {
 					let mut sample = Vec::new();
-					for pixel in 0..pixels {
+					for _pixel in 0..pixels {
 						sample.push(self.content[i + 16]);
 						i += 1;
 					}
@@ -94,37 +94,40 @@ impl 	File {
 
 	fn	getLabels(&self) -> Result<Vec<u8>, FileType> {
 		match self._type {
-			FileType::Label => Ok(self.images[0][0]),
+			FileType::Label => Ok(self.images[0][0].clone()),
 			_				=> Err(FileType::Error)
 		}
 	}
 }
 
-pub fn zip(x: Vec<u8>, y: Vec<u8>) -> Result<Vec<(u8, u8)>, ()> {
-	if x.len() != y.len() { return Err(())}
+pub fn zip(x: Vec<u8>, y: &Vec<u8>) -> Result<Vec<(u8, u8)>, ()> {
+	if x.len() != (*y).len() { return Err(())}
 	let mut zipped = Vec::new();
 	for i in 0..x.len() {
-		zipped.push((x[i], y[i]));
+		zipped.push((x[i], (*y)[i]));
 	}
-	zipped
+	Ok(zipped)
 }
 
-pub fn dist(x: Vec<u8>, y: Vec<u8>) -> u16 {
-	let mut distance = 0;
-	let zipped = zip(x, y).expect("Lists do not have the same length.");
-	for (x_i, y_i) in zipped.to_iter() {
-		distance += (x_i - y_i).pow(2);
+pub fn dist(x: Vec<u8>, y: &Vec<u8>) -> u16 {
+	let mut distance: u16	= 0;
+	let zipped				= zip(x, y).expect("Lists do not have the same length.");
+	for (x_i, y_i) in zipped.iter() {
+		let calculus	= (x_i - y_i).pow(2) as u16;
+		distance		= distance + calculus;
 	}
-	distance.sqrt()
+	let mut res: f32	= distance as f32;
+	res					= res.sqrt();
+	res as u16
 }
 
 
-pub fn get_training_distances_for_test_sample(x_train: Vec<Vec<u8>>,
+pub fn get_training_distances_for_test_sample(x_train: &Vec<Vec<u8>>,
 											  test_sample: Vec<u8>)
 											  -> Vec<u8> {
 	let mut distances = Vec::new();
-	for train_sample in x_train.to_iter() {
-		distances.push(dist(train_sample.unwrap(), &test_sample));
+	for train_sample in x_train.iter() {
+		distances.push(dist(train_sample.to_vec(), &test_sample).try_into().unwrap());
 	}
 	distances
 }
@@ -132,41 +135,51 @@ pub fn get_training_distances_for_test_sample(x_train: Vec<Vec<u8>>,
 pub fn enumerate(simple_vector: Vec<u8>) -> Vec<(u8, u8)> {
 	let mut vec_enumerated = Vec::new();
 	for i in 0..simple_vector.len() {
-		vec_enumerated.push((simple_vector[i], i));
+		vec_enumerated.push((simple_vector[i], i as u8));
 	}
 	vec_enumerated
 }
 
-pub fn sort_and_return_indices(_vec: Vec<(u8, u8)>) -> Vec<u8> {
-	let mut indices = Vec::new();
-	//TODO: finish the function by sorting y based on x
-	for (_x, y) in _vec.to_iter() {
-		indices.push(y);
+pub fn sort_and_return_indices(mut indices: Vec<(u8, u8)>) -> Vec<u8> {
+	indices.sort_by(|a, b| a.0.cmp(&b.0));
+	let mut res	= Vec::new();
+	for (_x, y) in indices.iter() {
+		res.push(*y)
 	}
-	Vec::from(*indices.sort())
+	res
+}
+
+pub fn	get_candidates(sorted_dist: Vec<u8>, y_train: Vec<u8>, k: usize) -> Vec<u8> {
+	let mut res = Vec::new();
+	for idx in Vec::from(sorted_dist)[0..=k].iter() {
+		res.push(y_train[*idx as usize]);
+	}
+	res
 }
 
 pub fn	k_nearest_neighbours(x_train: Vec<Vec<u8>>	,
-							 y_train: Vec<u8>>		,
+							 y_train: Vec<u8>		,
 							 x_test : Vec<Vec<u8>>	,
 							 k		: u8) -> Vec<u8> {
 	let mut y_prediction = Vec::new();
-	for sample in x_train.to_iter() {
-		let training_distances = get_training_distances_for_test_sample(&x_train, sample);
-		let sorted_distance_indices = sort_and_return_indices(enumerate(training_distances));
-		y_prediction.push();
+	for sample in x_train.iter() {
+		let training_distances		= get_training_distances_for_test_sample(&x_train, sample.to_vec());
+		let sorted_distance_indices	= sort_and_return_indices(enumerate(training_distances));
+		let candidates				= get_candidates(sorted_distance_indices, y_train.clone(), k.into());
+		println!("{:?}\n", candidates);
+		y_prediction.push(k);
 	}
 	y_prediction
 }
 
 fn	main() {
 	let x_test_file		= File::new(&DATA_FILENAME_IMG);
-	let y_test_file		= File::new(&DATA_FILENAME_LAB);
+	//let y_test_file		= File::new(&DATA_FILENAME_LAB);
     let x_train_file	= File::new(&DATA_FILENAME_IMG);
     let y_train_file	= File::new(&DATA_FILENAME_LAB);
 	let x_test_feat		= x_test_file.features().expect("wrong file type");
 	let x_train_feat	= x_train_file.features().expect("wrong file type");
 	let y_train_label	= y_train_file.getLabels().expect("wrong file type");
-	let y_test_label	= y_test_file.getLabels().expect("wrong file type");
-	k_nearest_neighbours(x_train_feat, y_train_label, x_test_feat, y_test_label);
+	//let y_test_label	= y_test_file.getLabels().expect("wrong file type");
+	k_nearest_neighbours(x_train_feat, y_train_label, x_test_feat, 3);
 }
