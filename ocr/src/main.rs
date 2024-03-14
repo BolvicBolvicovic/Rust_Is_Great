@@ -21,7 +21,7 @@ pub enum	FileType {
 
 pub struct	File {
 	content	: Vec<u8>,
-	name	: String,
+	_name	: String,
 	_type	: FileType,
 	images	: Vec<Vec<Vec<u8>>>,
 }
@@ -30,7 +30,7 @@ impl 	File {
 		if filename.rfind("-ubyte") == None {
 			return File {
 				content	: Vec::new(),
-				name	: String::from(filename),
+				_name	: String::from(filename),
 				_type	: FileType::Error,
 				images	: Vec::new(),
 			};
@@ -65,7 +65,7 @@ impl 	File {
 		}
 		File {
 			content : Vec::from(cont),
-			name	: String::from(filename),
+			_name	: String::from(filename),
 			_type	: _type,
 			images	: my_imgs,
 		}
@@ -92,7 +92,7 @@ impl 	File {
 		}
 	}
 
-	fn	getLabels(&self) -> Result<Vec<u8>, FileType> {
+	fn	get_labels(&self) -> Result<Vec<u8>, FileType> {
 		match self._type {
 			FileType::Label => Ok(self.images[0][0].clone()),
 			_				=> Err(FileType::Error)
@@ -109,22 +109,23 @@ pub fn zip(x: Vec<u8>, y: &Vec<u8>) -> Result<Vec<(u8, u8)>, ()> {
 	Ok(zipped)
 }
 
-pub fn dist(x: Vec<u8>, y: &Vec<u8>) -> u16 {
-	let mut distance: u16	= 0;
+pub fn dist(x: Vec<u8>, y: &Vec<u8>) -> u64 {
+	let mut distance: u64	= 0;
 	let zipped				= zip(x, y).expect("Lists do not have the same length.");
 	for (x_i, y_i) in zipped.iter() {
-		let calculus	= (x_i - y_i).pow(2) as u16;
-		distance		= distance + calculus;
+		if *x_i > *y_i {
+			distance		= distance + ((*x_i - *y_i) as u64);
+		} else {
+			distance		= distance + ((*y_i - *x_i) as u64);
+		}
 	}
-	let mut res: f32	= distance as f32;
-	res					= res.sqrt();
-	res as u16
+	distance
 }
 
 
 pub fn get_training_distances_for_test_sample(x_train: &Vec<Vec<u8>>,
 											  test_sample: Vec<u8>)
-											  -> Vec<u8> {
+											  -> Vec<u64> {
 	let mut distances = Vec::new();
 	for train_sample in x_train.iter() {
 		distances.push(dist(train_sample.to_vec(), &test_sample).try_into().unwrap());
@@ -132,7 +133,7 @@ pub fn get_training_distances_for_test_sample(x_train: &Vec<Vec<u8>>,
 	distances
 }
 
-pub fn enumerate(simple_vector: Vec<u8>) -> Vec<(u8, u8)> {
+pub fn enumerate(simple_vector: Vec<u64>) -> Vec<(u64, u8)> {
 	let mut vec_enumerated = Vec::new();
 	for i in 0..simple_vector.len() {
 		vec_enumerated.push((simple_vector[i], i as u8));
@@ -140,7 +141,7 @@ pub fn enumerate(simple_vector: Vec<u8>) -> Vec<(u8, u8)> {
 	vec_enumerated
 }
 
-pub fn sort_and_return_indices(mut indices: Vec<(u8, u8)>) -> Vec<u8> {
+pub fn sort_and_return_indices(mut indices: Vec<(u64, u8)>) -> Vec<u8> {
 	indices.sort_by(|a, b| a.0.cmp(&b.0));
 	let mut res	= Vec::new();
 	for (_x, y) in indices.iter() {
@@ -151,10 +152,28 @@ pub fn sort_and_return_indices(mut indices: Vec<(u8, u8)>) -> Vec<u8> {
 
 pub fn	get_candidates(sorted_dist: Vec<u8>, y_train: Vec<u8>, k: usize) -> Vec<u8> {
 	let mut res = Vec::new();
-	for idx in Vec::from(sorted_dist)[0..=k].iter() {
+	for idx in Vec::from(sorted_dist)[0..k].iter() {
 		res.push(y_train[*idx as usize]);
 	}
 	res
+}
+
+pub fn	find_best(candidates: Vec<u8>) -> u8 {
+	let mut best_index: u8 = 0;
+	let mut best_score = 0;
+	for i in 0..candidates.len() {
+		let mut score = 0;
+		for j in 0..candidates.len() {
+			if candidates[i] == candidates[j] {
+				score += 1;
+			}
+		}
+		if score > best_score {
+			best_index = candidates[i];
+			best_score = score;
+		}
+	}
+	best_index
 }
 
 pub fn	k_nearest_neighbours(x_train: Vec<Vec<u8>>	,
@@ -162,12 +181,14 @@ pub fn	k_nearest_neighbours(x_train: Vec<Vec<u8>>	,
 							 x_test : Vec<Vec<u8>>	,
 							 k		: u8) -> Vec<u8> {
 	let mut y_prediction = Vec::new();
+	let mut i = 0;
 	for sample in x_train.iter() {
 		let training_distances		= get_training_distances_for_test_sample(&x_train, sample.to_vec());
 		let sorted_distance_indices	= sort_and_return_indices(enumerate(training_distances));
 		let candidates				= get_candidates(sorted_distance_indices, y_train.clone(), k.into());
-		println!("{:?}\n", candidates);
-		y_prediction.push(k);
+		println!("Point: {} | Guess: {} | Guess list: {:?}\n", y_train[i], find_best(candidates.clone()), candidates);
+		i += 1;
+		y_prediction.push(find_best(candidates));
 	}
 	y_prediction
 }
@@ -175,11 +196,11 @@ pub fn	k_nearest_neighbours(x_train: Vec<Vec<u8>>	,
 fn	main() {
 	let x_test_file		= File::new(&DATA_FILENAME_IMG);
 	//let y_test_file		= File::new(&DATA_FILENAME_LAB);
-    let x_train_file	= File::new(&DATA_FILENAME_IMG);
-    let y_train_file	= File::new(&DATA_FILENAME_LAB);
+    let x_train_file	= File::new(&TRAIN_FILENAME_IMG);
+    let y_train_file	= File::new(&TRAIN_FILENAME_LAB);
 	let x_test_feat		= x_test_file.features().expect("wrong file type");
 	let x_train_feat	= x_train_file.features().expect("wrong file type");
-	let y_train_label	= y_train_file.getLabels().expect("wrong file type");
-	//let y_test_label	= y_test_file.getLabels().expect("wrong file type");
-	k_nearest_neighbours(x_train_feat, y_train_label, x_test_feat, 3);
+	let y_train_label	= y_train_file.get_labels().expect("wrong file type");
+	//let y_test_label	= y_test_file.get_labels().expect("wrong file type");
+	k_nearest_neighbours(x_train_feat, y_train_label, x_test_feat, 5);
 }
