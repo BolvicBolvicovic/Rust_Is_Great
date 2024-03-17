@@ -5,9 +5,13 @@ A Little Game of Life, as its name fomulates it, is a game of life made in Rust 
 ## Installation
 
 Clone my set of projects to get access to the project.
-
 ```bash
 git clone https://github.com/BolvicBolvicovic/Rust_Is_Great.git
+```
+
+Then enter cd project folder and follow the instructions bellow:
+
+```bash
 cd wasm-game-of-life
 wasm-pack build
 cd web
