@@ -86,6 +86,11 @@ impl Universe {
 	pub fn render (&self) -> String {
 		self.to_string()
 	}
+
+	pub fn toggle_cell (&mut self, row: u32, column: u32) {
+		let idx = self.get_cell_index(row, column);
+		self.cells.toggle(idx);
+	}
 }
 
 impl fmt::Display for Universe {
