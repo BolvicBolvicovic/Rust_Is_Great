@@ -9,7 +9,7 @@ Clone my set of projects to get access to the project.
 git clone https://github.com/BolvicBolvicovic/Rust_Is_Great.git
 ```
 
-Then enter cd project folder and follow the instructions bellow:
+Then enter the project folder and follow the instructions bellow:
 
 ```bash
 cd wasm-game-of-life
