@@ -47,17 +47,54 @@ impl Universe {
 	
 	fn alive_neighbors_count(&self, row: u32, column: u32) -> u8 {
 		let mut count = 0;
-		for delta_row in [self.height - 1, 0, 1].iter().cloned() {
-			for delta_col in [self.width - 1, 0, 1].iter().cloned() {
-				if delta_row == 0 && delta_col == 0 {
-					continue ;
-				}
-			let neighbor_row = (row +delta_row) % self.height;
-			let neighbor_col = (column + delta_col) % self.width;
-			let idx = self.get_cell_index(neighbor_row, neighbor_col);
-			count += self.cells[idx] as u8;
-			}
-		}
+		let north = if row == 0 {
+    	    	self.height - 1
+    		} else {
+    	    	row - 1
+    	};
+
+    	let south = if row == self.height - 1 {
+				0
+    		} else {
+    		    row + 1
+    	};
+
+    	let west = if column == 0 {
+    	    	self.width - 1
+    		} else {
+    	    	column - 1
+    	};
+
+    	let east = if column == self.width - 1 {
+    		    0
+    		} else {
+    		    column + 1
+    	};
+
+    	let nw = self.get_cell_index(north, west);
+    	count += self.cells[nw] as u8;
+
+    	let n = self.get_cell_index(north, column);
+    	count += self.cells[n] as u8;
+
+    	let ne = self.get_cell_index(north, east);
+    	count += self.cells[ne] as u8;
+
+    	let w = self.get_cell_index(row, west);
+    	count += self.cells[w] as u8;
+
+    	let e = self.get_cell_index(row, east);
+    	count += self.cells[e] as u8;
+
+    	let sw = self.get_cell_index(south, west);
+    	count += self.cells[sw] as u8;
+
+    	let s = self.get_cell_index(south, column);
+    	count += self.cells[s] as u8;
+
+    	let se = self.get_cell_index(south, east);
+		count += self.cells[se] as u8;
+	
 		count
 	}
 
@@ -69,7 +106,7 @@ impl Universe {
 		let mut cells = FixedBitSet::with_capacity(size);
 
 		for i in 0..size {
-			cells.set(i, js_sys::Math::random() < 0.5);
+			cells.set(i, false);
 		}
 
 		Universe {
