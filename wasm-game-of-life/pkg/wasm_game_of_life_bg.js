@@ -114,11 +114,35 @@ export class Universe {
         }
     }
     /**
+    */
+    clear_cells() {
+        wasm.universe_clear_cells(this.__wbg_ptr);
+    }
+    /**
     * @param {number} row
     * @param {number} column
     */
     toggle_cell(row, column) {
         wasm.universe_toggle_cell(this.__wbg_ptr, row, column);
+    }
+    /**
+    */
+    random_restart() {
+        wasm.universe_random_restart(this.__wbg_ptr);
+    }
+    /**
+    * @param {number} row
+    * @param {number} column
+    */
+    glider(row, column) {
+        wasm.universe_glider(this.__wbg_ptr, row, column);
+    }
+    /**
+    * @param {number} row
+    * @param {number} column
+    */
+    pulsar(row, column) {
+        wasm.universe_pulsar(this.__wbg_ptr, row, column);
     }
 }
 

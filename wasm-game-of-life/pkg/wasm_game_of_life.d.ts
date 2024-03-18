@@ -28,8 +28,24 @@ export class Universe {
 */
   render(): string;
 /**
+*/
+  clear_cells(): void;
+/**
 * @param {number} row
 * @param {number} column
 */
   toggle_cell(row: number, column: number): void;
+/**
+*/
+  random_restart(): void;
+/**
+* @param {number} row
+* @param {number} column
+*/
+  glider(row: number, column: number): void;
+/**
+* @param {number} row
+* @param {number} column
+*/
+  pulsar(row: number, column: number): void;
 }

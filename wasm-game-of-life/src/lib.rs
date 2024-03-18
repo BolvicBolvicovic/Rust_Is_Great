@@ -87,9 +87,103 @@ impl Universe {
 		self.to_string()
 	}
 
-	pub fn toggle_cell (&mut self, row: u32, column: u32) {
+	pub fn clear_cells(&mut self) {
+		self.cells.clear();
+	}
+
+	pub fn toggle_cell(&mut self, row: u32, column: u32) {
 		let idx = self.get_cell_index(row, column);
 		self.cells.toggle(idx);
+	}
+
+	pub fn random_restart(&mut self) {
+		self.clear_cells();
+		for i in 0..(self.width * self.height) {
+			self.cells.set(i as usize, js_sys::Math::random() < 0.5);
+		}
+	}
+
+	pub fn glider(&mut self, row: u32, column: u32) {
+		if row > 3 && column > 3 && row < self.width - 3 && column < self.height - 3 {
+			let row_offset: u32 = row - 2;
+			let col_offset: u32 = column - 2;
+			for i in row_offset..(row_offset + 5) {
+				for j in col_offset..(col_offset + 5) {
+					let idx = self.get_cell_index(i, j);
+					if self.cells[idx] == true {
+						self.cells.toggle(idx);
+					}
+					if		i == row_offset + 1  && j == col_offset + 2 { self.cells.toggle(idx); }
+					else if i == row_offset + 2  && j == col_offset + 3 { self.cells.toggle(idx); }
+					else if i == row_offset + 3  && j == col_offset + 1 { self.cells.toggle(idx); }
+					else if i == row_offset + 3  && j == col_offset + 2 { self.cells.toggle(idx); }
+					else if i == row_offset + 3  && j == col_offset + 3 { self.cells.toggle(idx); }
+				}
+			}
+		}
+	}
+	
+	pub fn pulsar(&mut self, row: u32, column: u32) {
+		if row > 7 && column > 7 && row < self.width - 7 && column < self.height - 7 {
+			let row_offset: u32 = row - 6;
+			let col_offset: u32 = column - 6;
+			for i in row_offset..(row_offset + 13) {
+				for j in col_offset..(col_offset + 13) {
+					let idx = self.get_cell_index(i, j);
+					if self.cells[idx] == true {
+						self.cells.toggle(idx);
+					}
+					if		i == row_offset      && j == col_offset + 2 { self.cells.toggle(idx); }
+					else if i == row_offset      && j == col_offset + 3 { self.cells.toggle(idx); }
+					else if i == row_offset      && j == col_offset + 4 { self.cells.toggle(idx); }
+					else if i == row_offset      && j == col_offset + 8 { self.cells.toggle(idx); }
+					else if i == row_offset      && j == col_offset + 9 { self.cells.toggle(idx); }
+					else if i == row_offset      && j == col_offset + 10{ self.cells.toggle(idx); }
+					else if	i == row_offset + 5  && j == col_offset + 2 { self.cells.toggle(idx); }
+					else if i == row_offset + 5  && j == col_offset + 3 { self.cells.toggle(idx); }
+					else if i == row_offset + 5  && j == col_offset + 4 { self.cells.toggle(idx); }
+					else if i == row_offset + 5  && j == col_offset + 8 { self.cells.toggle(idx); }
+					else if i == row_offset + 5  && j == col_offset + 9 { self.cells.toggle(idx); }
+					else if i == row_offset + 5  && j == col_offset + 10{ self.cells.toggle(idx); }
+					else if	i == row_offset + 7  && j == col_offset + 2 { self.cells.toggle(idx); }
+					else if i == row_offset + 7  && j == col_offset + 3 { self.cells.toggle(idx); }
+					else if i == row_offset + 7  && j == col_offset + 4 { self.cells.toggle(idx); }
+					else if i == row_offset + 7  && j == col_offset + 8 { self.cells.toggle(idx); }
+					else if i == row_offset + 7  && j == col_offset + 9 { self.cells.toggle(idx); }
+					else if i == row_offset + 7  && j == col_offset + 10{ self.cells.toggle(idx); }
+					else if	i == row_offset + 12 && j == col_offset + 2 { self.cells.toggle(idx); }
+					else if i == row_offset + 12 && j == col_offset + 3 { self.cells.toggle(idx); }
+					else if i == row_offset + 12 && j == col_offset + 4 { self.cells.toggle(idx); }
+					else if i == row_offset + 12 && j == col_offset + 8 { self.cells.toggle(idx); }
+					else if i == row_offset + 12 && j == col_offset + 9 { self.cells.toggle(idx); }
+					else if i == row_offset + 12 && j == col_offset + 10{ self.cells.toggle(idx); }
+					else if i == row_offset + 2  && j == col_offset     { self.cells.toggle(idx); }
+					else if i == row_offset + 2  && j == col_offset + 5 { self.cells.toggle(idx); }
+					else if i == row_offset + 2  && j == col_offset + 7 { self.cells.toggle(idx); }
+					else if i == row_offset + 2  && j == col_offset + 12{ self.cells.toggle(idx); }
+					else if i == row_offset + 3  && j == col_offset     { self.cells.toggle(idx); }
+					else if i == row_offset + 3  && j == col_offset + 5 { self.cells.toggle(idx); }
+					else if i == row_offset + 3  && j == col_offset + 7 { self.cells.toggle(idx); }
+					else if i == row_offset + 3  && j == col_offset + 12{ self.cells.toggle(idx); }
+					else if i == row_offset + 4  && j == col_offset     { self.cells.toggle(idx); }
+					else if i == row_offset + 4  && j == col_offset + 5 { self.cells.toggle(idx); }
+					else if i == row_offset + 4  && j == col_offset + 7 { self.cells.toggle(idx); }
+					else if i == row_offset + 4  && j == col_offset + 12{ self.cells.toggle(idx); }
+					else if i == row_offset + 8  && j == col_offset     { self.cells.toggle(idx); }
+					else if i == row_offset + 8  && j == col_offset + 5 { self.cells.toggle(idx); }
+					else if i == row_offset + 8  && j == col_offset + 7 { self.cells.toggle(idx); }
+					else if i == row_offset + 8  && j == col_offset + 12{ self.cells.toggle(idx); }
+					else if i == row_offset + 9  && j == col_offset     { self.cells.toggle(idx); }
+					else if i == row_offset + 9  && j == col_offset + 5 { self.cells.toggle(idx); }
+					else if i == row_offset + 9  && j == col_offset + 7 { self.cells.toggle(idx); }
+					else if i == row_offset + 9  && j == col_offset + 12{ self.cells.toggle(idx); }
+					else if i == row_offset + 10 && j == col_offset     { self.cells.toggle(idx); }
+					else if i == row_offset + 10 && j == col_offset + 5 { self.cells.toggle(idx); }
+					else if i == row_offset + 10 && j == col_offset + 7 { self.cells.toggle(idx); }
+					else if i == row_offset + 10 && j == col_offset + 12{ self.cells.toggle(idx); }
+				}
+			}
+		}
 	}
 }
 

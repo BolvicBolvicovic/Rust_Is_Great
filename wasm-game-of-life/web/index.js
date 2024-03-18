@@ -74,7 +74,12 @@ const isPaused = () => {
 	return animationId === null;
 };
 
-const playPauseButton = document.getElementById("play-pause");
+//Buttons and Widgets
+
+const playPauseButton	= document.getElementById("play-pause");
+const clearButton		= document.getElementById("clear-map");
+const restartButton		= document.getElementById("random-restart");
+const frameWidget		= document.getElementById("frame-widget");
 
 const play = () => {
   playPauseButton.textContent = "⏸";
@@ -87,6 +92,26 @@ const pause = () => {
   animationId = null;
 };
 
+
+let ticksPerFrame = parseInt(frameWidget.value);
+
+const renderLoop = () => {
+	drawGrid();
+	drawCells();
+
+	for (let i = 0; i < ticksPerFrame; i++) {
+		universe.tick();
+	}
+	
+	animationId = requestAnimationFrame(renderLoop);
+};
+
+//EVENTS
+
+frameWidget.addEventListener("input", () => {
+	ticksPerFrame = parseInt(frameWidget.value);
+});
+
 playPauseButton.addEventListener("click", event => {
   if (isPaused()) {
     play();
@@ -95,33 +120,48 @@ playPauseButton.addEventListener("click", event => {
   }
 });
 
-const renderLoop = () => {
+clearButton.addEventListener("click", event => {
+	if (isPaused()) {
+		universe.clear_cells();
+		drawGrid();
+		drawCells();
+	}
+});
+
+restartButton.addEventListener("click", event => {
+	pause();
+	universe.random_restart();
 	drawGrid();
 	drawCells();
-
-	universe.tick();
-	
-	animationId = requestAnimationFrame(renderLoop);
-};
-canvas.addEventListener("click", event => {
-  const boundingRect = canvas.getBoundingClientRect();
-
-  const scaleX = canvas.width / boundingRect.width;
-  const scaleY = canvas.height / boundingRect.height;
-
-  const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
-  const canvasTop = (event.clientY - boundingRect.top) * scaleY;
-
-  const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), height - 1);
-  const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), width - 1);
-
-  universe.toggle_cell(row, col);
-
-  drawGrid();
-  drawCells();
 });
+
+canvas.addEventListener("click", event => {
+	const boundingRect = canvas.getBoundingClientRect();
+
+	const scaleX = canvas.width / boundingRect.width;
+	const scaleY = canvas.height / boundingRect.height;
+
+	const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
+	const canvasTop = (event.clientY - boundingRect.top) * scaleY;
+
+	const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), height - 1);
+	const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), width - 1);
+
+	if (event.ctrlKey) {
+		universe.glider(row, col);
+	} else if (event.shiftKey) {
+		universe.pulsar(row, col);
+	} else {
+		universe.toggle_cell(row, col);
+	}
+
+	drawGrid();
+	drawCells();
+});
+
+//main script
 
 drawGrid();
 drawCells();
 
-play();
+pause();
