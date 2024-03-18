@@ -187,8 +187,7 @@ impl Universe {
 							i == row_offset + 4 ||
 							i == row_offset + 8 ||
 							i == row_offset + 9 ||
-							i == row_offset + 10||
-							i == row_offset + 12) &&
+							i == row_offset + 10) &&
 						(	j == col_offset 	||
 							j == col_offset + 5 ||
 							j == col_offset + 7 ||
