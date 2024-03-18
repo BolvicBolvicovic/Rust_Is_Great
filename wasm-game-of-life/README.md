@@ -2,6 +2,14 @@
 
 A Little Game of Life, as its name fomulates it, is a game of life made in Rust and compiled in wasm.
 
+# Needed Tools
+
+You will need to download [npm](https://lesbricodeurs.fr/articles/Comment-installer-npm-proprement/) and wasm-pack. 
+
+```bash
+cargo install wasm-pack
+```
+
 ## Installation
 
 Clone my set of projects to get access to the project.
