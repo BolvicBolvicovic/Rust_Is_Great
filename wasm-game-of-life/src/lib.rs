@@ -197,6 +197,35 @@ impl Universe {
 			}
 		}
 	}
+	
+	pub fn pentadecathlon(&mut self, row: u32, column: u32) {
+		if row > 12 && column > 12 && row < self.width - 12 && column < self.height - 12 {
+			let row_offset: u32 = row - 1;
+			let col_offset: u32 = column - 4;
+			for i in row_offset..(row_offset + 3) {
+				for j in col_offset..(col_offset + 10) {
+					let idx = self.get_cell_index(i, j);
+					if self.cells[idx] {
+						self.cells.toggle(idx);
+					}
+					if	((	i == row_offset 	||
+							i == row_offset + 2) &&
+						(	j == col_offset + 2 ||
+							j == col_offset + 7)) ||
+						(	i == row_offset + 1 &&
+						(	j == col_offset 	||
+							j == col_offset + 1 ||
+							j == col_offset + 3 ||
+							j == col_offset + 4 ||
+							j == col_offset + 5 ||
+							j == col_offset + 6 ||
+							j == col_offset + 8 ||
+							j == col_offset + 9))
+						{ self.cells.toggle(idx); }
+				}
+			}
+		}
+	}
 }
 
 impl Default for Universe {

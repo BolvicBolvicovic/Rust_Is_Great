@@ -3,12 +3,20 @@
   "collaborators": [
     "Bolvic <victor.bolheme@gmail.com>"
   ],
+  "description": "It is a game of life that compiles in wasm. You can lauch it on your browser.",
   "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BolvicBolvicovic/Rust_Is_Great/tree/main/wasm-game-of-life"
+  },
   "files": [
     "wasm_game_of_life_bg.wasm",
     "wasm_game_of_life.js",
     "wasm_game_of_life_bg.js",
-    "wasm_game_of_life.d.ts"
+    "wasm_game_of_life.d.ts",
+    "LICENSE_MIT",
+    "LICENSE_APACHE"
   ],
   "module": "wasm_game_of_life.js",
   "types": "wasm_game_of_life.d.ts",

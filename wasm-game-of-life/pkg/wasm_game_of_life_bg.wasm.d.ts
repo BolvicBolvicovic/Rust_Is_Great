@@ -13,5 +13,6 @@ export function universe_toggle_cell(a: number, b: number, c: number): void;
 export function universe_random_restart(a: number): void;
 export function universe_glider(a: number, b: number, c: number): void;
 export function universe_pulsar(a: number, b: number, c: number): void;
+export function universe_pentadecathlon(a: number, b: number, c: number): void;
 export function __wbindgen_add_to_stack_pointer(a: number): number;
 export function __wbindgen_free(a: number, b: number, c: number): void;

@@ -144,6 +144,13 @@ export class Universe {
     pulsar(row, column) {
         wasm.universe_pulsar(this.__wbg_ptr, row, column);
     }
+    /**
+    * @param {number} row
+    * @param {number} column
+    */
+    pentadecathlon(row, column) {
+        wasm.universe_pentadecathlon(this.__wbg_ptr, row, column);
+    }
 }
 
 export const __wbg_random_1385edd75e02760c = typeof Math.random == 'function' ? Math.random : notDefined('Math.random');

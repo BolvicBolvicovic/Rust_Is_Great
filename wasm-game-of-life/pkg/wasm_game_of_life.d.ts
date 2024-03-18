@@ -48,4 +48,9 @@ export class Universe {
 * @param {number} column
 */
   pulsar(row: number, column: number): void;
+/**
+* @param {number} row
+* @param {number} column
+*/
+  pentadecathlon(row: number, column: number): void;
 }

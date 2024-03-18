@@ -219,6 +219,8 @@ canvas.addEventListener("click", event => {
 		universe.glider(row, col);
 	} else if (event.shiftKey) {
 		universe.pulsar(row, col);
+	} else if (event.altKey) {
+		universe.pentadecathlon(row, col);
 	} else {
 		universe.toggle_cell(row, col);
 	}
