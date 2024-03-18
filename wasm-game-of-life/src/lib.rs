@@ -1,11 +1,10 @@
-mod utils;
-
 extern crate fixedbitset;
 extern crate js_sys;
 
 use fixedbitset::FixedBitSet;
 use std::fmt;
 use wasm_bindgen::prelude::*;
+use std::mem;
 
 
 #[cfg(feature = "wee_alloc")]
@@ -14,22 +13,21 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 pub struct Universe {
-	width: u32,
-	height: u32,
-	cells: FixedBitSet,
+	width:	u32,
+	height:	u32,
+	cells:	FixedBitSet,
+	next:	FixedBitSet,
 }
 
 #[wasm_bindgen]
 impl Universe {
 	pub fn tick(&mut self) {
-		let mut next = self.cells.clone();
-
 		for row in 0..self.height {
 			for col in 0..self.width {
 				let idx = self.get_cell_index(row, col);
 				let cell = self.cells[idx];
 				let alive_neighbors = self.alive_neighbors_count(row, col);
-				next.set(idx, match (cell, alive_neighbors) {
+				self.next.set(idx, match (cell, alive_neighbors) {
 					(true, x) if x < 2 => false,
 					(true, 2) | (true, 3) => true,
 					(true, x) if x > 3 => false,
@@ -38,7 +36,7 @@ impl Universe {
 				});
 			}
 		}
-		self.cells = next;
+		mem::swap(&mut self.cells, &mut self.next);
 	}
 	
 	fn get_cell_index(&self, row: u32, column: u32) -> usize {
@@ -102,17 +100,20 @@ impl Universe {
 		let width = 128;
 		let height = 128;
 
-		let size = (width * height) as usize;
-		let mut cells = FixedBitSet::with_capacity(size);
+		let size		= (width * height) as usize;
+		let mut cells	= FixedBitSet::with_capacity(size);
+		let mut next	= FixedBitSet::with_capacity(size);
 
 		for i in 0..size {
 			cells.set(i, false);
+			next.set(i, false);
 		}
 
 		Universe {
 			width,
 			height,
 			cells,
+			next,
 		}
 	}
 
@@ -147,14 +148,15 @@ impl Universe {
 			for i in row_offset..(row_offset + 5) {
 				for j in col_offset..(col_offset + 5) {
 					let idx = self.get_cell_index(i, j);
-					if self.cells[idx] == true {
+					if self.cells[idx] {
 						self.cells.toggle(idx);
 					}
-					if		i == row_offset + 1  && j == col_offset + 2 { self.cells.toggle(idx); }
-					else if i == row_offset + 2  && j == col_offset + 3 { self.cells.toggle(idx); }
-					else if i == row_offset + 3  && j == col_offset + 1 { self.cells.toggle(idx); }
-					else if i == row_offset + 3  && j == col_offset + 2 { self.cells.toggle(idx); }
-					else if i == row_offset + 3  && j == col_offset + 3 { self.cells.toggle(idx); }
+					if	(i == row_offset + 1 && j == col_offset + 2) ||
+						(i == row_offset + 2 && j == col_offset + 3) ||
+						(i == row_offset + 3 && (j == col_offset +1 ||
+												j == col_offset + 2 ||
+												j == col_offset + 3))
+						{ self.cells.toggle(idx); }
 				}
 			}
 		}
@@ -167,60 +169,40 @@ impl Universe {
 			for i in row_offset..(row_offset + 13) {
 				for j in col_offset..(col_offset + 13) {
 					let idx = self.get_cell_index(i, j);
-					if self.cells[idx] == true {
+					if self.cells[idx] {
 						self.cells.toggle(idx);
 					}
-					if		i == row_offset      && j == col_offset + 2 { self.cells.toggle(idx); }
-					else if i == row_offset      && j == col_offset + 3 { self.cells.toggle(idx); }
-					else if i == row_offset      && j == col_offset + 4 { self.cells.toggle(idx); }
-					else if i == row_offset      && j == col_offset + 8 { self.cells.toggle(idx); }
-					else if i == row_offset      && j == col_offset + 9 { self.cells.toggle(idx); }
-					else if i == row_offset      && j == col_offset + 10{ self.cells.toggle(idx); }
-					else if	i == row_offset + 5  && j == col_offset + 2 { self.cells.toggle(idx); }
-					else if i == row_offset + 5  && j == col_offset + 3 { self.cells.toggle(idx); }
-					else if i == row_offset + 5  && j == col_offset + 4 { self.cells.toggle(idx); }
-					else if i == row_offset + 5  && j == col_offset + 8 { self.cells.toggle(idx); }
-					else if i == row_offset + 5  && j == col_offset + 9 { self.cells.toggle(idx); }
-					else if i == row_offset + 5  && j == col_offset + 10{ self.cells.toggle(idx); }
-					else if	i == row_offset + 7  && j == col_offset + 2 { self.cells.toggle(idx); }
-					else if i == row_offset + 7  && j == col_offset + 3 { self.cells.toggle(idx); }
-					else if i == row_offset + 7  && j == col_offset + 4 { self.cells.toggle(idx); }
-					else if i == row_offset + 7  && j == col_offset + 8 { self.cells.toggle(idx); }
-					else if i == row_offset + 7  && j == col_offset + 9 { self.cells.toggle(idx); }
-					else if i == row_offset + 7  && j == col_offset + 10{ self.cells.toggle(idx); }
-					else if	i == row_offset + 12 && j == col_offset + 2 { self.cells.toggle(idx); }
-					else if i == row_offset + 12 && j == col_offset + 3 { self.cells.toggle(idx); }
-					else if i == row_offset + 12 && j == col_offset + 4 { self.cells.toggle(idx); }
-					else if i == row_offset + 12 && j == col_offset + 8 { self.cells.toggle(idx); }
-					else if i == row_offset + 12 && j == col_offset + 9 { self.cells.toggle(idx); }
-					else if i == row_offset + 12 && j == col_offset + 10{ self.cells.toggle(idx); }
-					else if i == row_offset + 2  && j == col_offset     { self.cells.toggle(idx); }
-					else if i == row_offset + 2  && j == col_offset + 5 { self.cells.toggle(idx); }
-					else if i == row_offset + 2  && j == col_offset + 7 { self.cells.toggle(idx); }
-					else if i == row_offset + 2  && j == col_offset + 12{ self.cells.toggle(idx); }
-					else if i == row_offset + 3  && j == col_offset     { self.cells.toggle(idx); }
-					else if i == row_offset + 3  && j == col_offset + 5 { self.cells.toggle(idx); }
-					else if i == row_offset + 3  && j == col_offset + 7 { self.cells.toggle(idx); }
-					else if i == row_offset + 3  && j == col_offset + 12{ self.cells.toggle(idx); }
-					else if i == row_offset + 4  && j == col_offset     { self.cells.toggle(idx); }
-					else if i == row_offset + 4  && j == col_offset + 5 { self.cells.toggle(idx); }
-					else if i == row_offset + 4  && j == col_offset + 7 { self.cells.toggle(idx); }
-					else if i == row_offset + 4  && j == col_offset + 12{ self.cells.toggle(idx); }
-					else if i == row_offset + 8  && j == col_offset     { self.cells.toggle(idx); }
-					else if i == row_offset + 8  && j == col_offset + 5 { self.cells.toggle(idx); }
-					else if i == row_offset + 8  && j == col_offset + 7 { self.cells.toggle(idx); }
-					else if i == row_offset + 8  && j == col_offset + 12{ self.cells.toggle(idx); }
-					else if i == row_offset + 9  && j == col_offset     { self.cells.toggle(idx); }
-					else if i == row_offset + 9  && j == col_offset + 5 { self.cells.toggle(idx); }
-					else if i == row_offset + 9  && j == col_offset + 7 { self.cells.toggle(idx); }
-					else if i == row_offset + 9  && j == col_offset + 12{ self.cells.toggle(idx); }
-					else if i == row_offset + 10 && j == col_offset     { self.cells.toggle(idx); }
-					else if i == row_offset + 10 && j == col_offset + 5 { self.cells.toggle(idx); }
-					else if i == row_offset + 10 && j == col_offset + 7 { self.cells.toggle(idx); }
-					else if i == row_offset + 10 && j == col_offset + 12{ self.cells.toggle(idx); }
+					if	((	i == row_offset		||
+							i == row_offset + 5 ||
+							i == row_offset + 7 ||
+							i == row_offset + 12) &&
+						(	j == col_offset + 2 ||
+							j == col_offset + 3 ||
+							j == col_offset + 4 ||
+							j == col_offset + 8 ||
+							j == col_offset + 9 ||
+							j == col_offset + 10)) ||
+						((	i == row_offset + 2 ||
+							i == row_offset + 3 ||
+							i == row_offset + 4 ||
+							i == row_offset + 8 ||
+							i == row_offset + 9 ||
+							i == row_offset + 10||
+							i == row_offset + 12) &&
+						(	j == col_offset 	||
+							j == col_offset + 5 ||
+							j == col_offset + 7 ||
+							j == col_offset + 12))
+						{ self.cells.toggle(idx); }
 				}
 			}
 		}
+	}
+}
+
+impl Default for Universe {
+	fn default() -> Self {
+		Self::new()
 	}
 }
 
@@ -228,10 +210,10 @@ impl fmt::Display for Universe {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		for line in self.cells.as_slice().chunks(self.width as usize) {
 			for &cell in line {
-				let symbol = if (cell != 0) == false {'◻'} else {'◼'};
+				let symbol = if cell == 0 {'◻'} else {'◼'};
 				write!(f, "{}", symbol)?;
 			}
-			write!(f, "\n")?;
+			writeln!(f)?;
 		}
 		Ok(())
 	}

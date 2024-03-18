@@ -10,6 +10,8 @@ const universe = Universe.new();
 const width = universe.get_width();
 const height = universe.get_height();
 
+// CANVAS
+
 const canvas = document.getElementById("game-of-life-canvas");
 canvas.height = (CELL_SIZE + 1) * height + 1;
 canvas.width = (CELL_SIZE + 1) * width + 1;
@@ -133,7 +135,7 @@ Frames per Second:\n
 avg of last 100 = ${Math.round(mean)}\n
 min of last 100 = ${Math.round(min)}\n
 max of last 100 = ${Math.round(max)}
-`.trim();
+`;
   }
 };
 
