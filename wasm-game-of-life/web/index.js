@@ -147,9 +147,11 @@ const clearButton		= document.getElementById("clear-map");
 const restartButton		= document.getElementById("random-restart");
 const frameWidget		= document.getElementById("frame-widget");
 
+let ticksPerFrame = parseInt(frameWidget.value);
+
 const play = () => {
-  playPauseButton.textContent = "⏸";
-  renderLoop();
+	playPauseButton.textContent = "⏸";
+	renderLoop();
 };
 
 const pause = () => {
@@ -158,8 +160,6 @@ const pause = () => {
   animationId = null;
 };
 
-
-let ticksPerFrame = parseInt(frameWidget.value);
 
 //RENDER LOOP
 
@@ -170,7 +170,6 @@ const renderLoop = () => {
 	}
 	drawGrid();
 	drawCells();
-
 	animationId = requestAnimationFrame(renderLoop);
 };
 

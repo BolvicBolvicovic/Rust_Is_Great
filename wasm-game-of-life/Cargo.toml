@@ -14,6 +14,7 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
+lazy_static		= "1.4"
 wasm-bindgen	= "0.2.84"
 js-sys			= "0.3"
 fixedbitset		= "0.4.2"

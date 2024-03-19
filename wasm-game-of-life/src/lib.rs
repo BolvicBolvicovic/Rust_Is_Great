@@ -1,6 +1,7 @@
 extern crate fixedbitset;
 extern crate js_sys;
 
+use lazy_static::lazy_static;
 use fixedbitset::FixedBitSet;
 use std::fmt;
 use wasm_bindgen::prelude::*;
@@ -10,6 +11,36 @@ use std::mem;
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
+lazy_static!{
+static ref	ENTITIES: Vec<Vec<u32>> = vec![vec![		//Glider
+						0,0,0,0,0,
+						0,0,1,0,0,
+						0,0,0,1,0,
+						0,1,1,1,0,
+						0,0,0,0,0,
+					],
+					vec![								//Pentadecathlon
+						0,0,1,0,0,0,0,1,0,0,
+						1,1,0,1,1,1,1,0,1,1,
+						0,0,1,0,0,0,0,1,0,0,
+					],
+					vec![								//Pulsar
+						0,0,1,1,1,0,0,0,1,1,1,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,
+						1,0,0,0,0,1,0,1,0,0,0,0,1,
+						1,0,0,0,0,1,0,1,0,0,0,0,1,
+						1,0,0,0,0,1,0,1,0,0,0,0,1,
+						0,0,1,1,1,0,0,0,1,1,1,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,1,1,1,0,0,0,1,1,1,0,0,
+						1,0,0,0,0,1,0,1,0,0,0,0,1,
+						1,0,0,0,0,1,0,1,0,0,0,0,1,
+						1,0,0,0,0,1,0,1,0,0,0,0,1,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,1,1,1,0,0,0,1,1,1,0,0,
+					]];
+}
 
 #[wasm_bindgen]
 pub struct Universe {
@@ -151,9 +182,12 @@ impl Universe {
 					if self.cells[idx] {
 						self.cells.toggle(idx);
 					}
+					/*if ENTITIES[0][(i * 5 + j) as usize] == 1 {
+						{ self.cells.toggle(idx); }
+					}*/
 					if	(i == row_offset + 1 && j == col_offset + 2) ||
 						(i == row_offset + 2 && j == col_offset + 3) ||
-						(i == row_offset + 3 && (j == col_offset +1 ||
+						(i == row_offset + 3 && (j == col_offset + 1 ||
 												j == col_offset + 2 ||
 												j == col_offset + 3))
 						{ self.cells.toggle(idx); }
