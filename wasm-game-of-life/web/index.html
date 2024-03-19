@@ -8,7 +8,7 @@
   <body class="flex justify-center flex-col grid">
 	<div class="text-2xl font-bold text-fuchsia-900 text-center pt-5">
 		<h1 class="text-5xl">Welcome to the Game of Life !</h1><br>
-		<p class="font-medium">-- 🦀 made in rust, complied in wasm 🕸️ --</p><br>
+		<p class="font-medium">-- 🦀 made in rust, compiled in wasm 🕸️ --</p><br>
 		<div class="grid grid-rows-2 grid-flow-col gap-2">
 			<p class="flex font-medium text-lg">tick per frame</p>
 			<input id="frame-widget" type="range" min="1" max="5" list="values" step="1" value="1" class="max-w-64 max-h-9"></input>
@@ -30,7 +30,7 @@
 	</div>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
 	<div class="flex-none mb-2">
-		<canvas id="game-of-life-canvas"></canvas>
+		<canvas id="game-of-life-canvas" class="rounded"></canvas>
 		<script src="./bootstrap.js"></script>
 	</div>
   </body>

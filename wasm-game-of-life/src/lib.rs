@@ -45,6 +45,7 @@ impl Universe {
 	
 	fn alive_neighbors_count(&self, row: u32, column: u32) -> u8 {
 		let mut count = 0;
+	// THIS IS FASTER MF
 		let north = if row == 0 {
     	    	self.height - 1
     		} else {
@@ -68,7 +69,6 @@ impl Universe {
     		} else {
     		    column + 1
     	};
-
     	let nw = self.get_cell_index(north, west);
     	count += self.cells[nw] as u8;
 

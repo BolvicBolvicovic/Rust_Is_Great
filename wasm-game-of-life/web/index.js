@@ -189,11 +189,10 @@ playPauseButton.addEventListener("click", event => {
 });
 
 clearButton.addEventListener("click", event => {
-	if (isPaused()) {
-		universe.clear_cells();
-		drawGrid();
-		drawCells();
-	}
+	pause();
+	universe.clear_cells();
+	drawGrid();
+	drawCells();
 });
 
 restartButton.addEventListener("click", event => {
