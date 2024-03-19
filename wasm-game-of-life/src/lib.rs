@@ -97,8 +97,8 @@ impl Universe {
 	}
 
 	pub fn new() -> Universe {
-		let width = 128;
-		let height = 128;
+		let width	= 64;
+		let height	= 64;
 
 		let size		= (width * height) as usize;
 		let mut cells	= FixedBitSet::with_capacity(size);

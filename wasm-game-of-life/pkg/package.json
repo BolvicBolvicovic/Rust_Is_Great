@@ -14,7 +14,9 @@
     "wasm_game_of_life_bg.wasm",
     "wasm_game_of_life.js",
     "wasm_game_of_life_bg.js",
-    "wasm_game_of_life.d.ts"
+    "wasm_game_of_life.d.ts",
+    "LICENSE_APACHE",
+    "LICENSE_MIT"
   ],
   "module": "wasm_game_of_life.js",
   "types": "wasm_game_of_life.d.ts",
