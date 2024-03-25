@@ -30,7 +30,7 @@ fn find_pattern(pattern: String, files: Vec<FullFile>) {
 	for file in files.iter() {
 		let mut lines = io::BufReader::new(file.file.try_clone().unwrap()).lines();
 		for line in lines.by_ref().enumerate() {
-			if let Some(_) = line.1.as_ref().expect("Panic: File cannot be read.").find(&pattern) {
+			if line.1.as_ref().expect("Panic: File cannot be read.").contains(&pattern) {
 				println!("{} at line {}: {}", file.name, line.0 + 1, line.1.unwrap());
 			}
 		}
