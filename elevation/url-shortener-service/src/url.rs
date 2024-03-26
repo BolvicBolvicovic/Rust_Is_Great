@@ -1,9 +1,5 @@
-mod urls;
-
 use rocket::serde::Serialize;
-use std::{
-	path::{ Path, PathBuf },
-};
+use std::path::{ Path, PathBuf };
 use rand::Rng;
 
 #[derive(FromForm)]
@@ -18,9 +14,9 @@ impl Clone for GetUrl {
 	}
 }
 
-#[derive(Serialize, diesel::Queryable, diesel::Insertable)]
+#[derive(Serialize)]
 pub struct Url {
-	pub url_id		: UrlId,
+	pub url_id		: u32,
 	pub url			: String,
 	pub shorten_url	: String,
 }
@@ -55,9 +51,9 @@ impl UrlId {
 		let mut rng			= rand::thread_rng();
 
 		for _ in 0..size {
-			id.push(BASE62[rng.gen::<usize>() % 62] as char);
+			id.push(BASE62[rng.gen::<usize>() % 62] as u32);
 		}
-		UrlId{ id : id, }
+		UrlId{ id : id }
 	}
 //TODO: change file_path so I actualy redirects to the database instead of a dir that contains lots of files
 	pub fn file_path(&self) -> PathBuf {
