@@ -1,57 +1,47 @@
 #![feature(proc_macro_hygiene, decl_macro)]
-
+#[macro_use] extern crate diesel;
 #[macro_use] extern crate rocket;
-//#[macro_use] extern crate rocket_contrib;
 
+mod url;
+mod urls;
+
+use url::{ Url, GetUrl, UrlId };
 use rocket::{
 	response::{ content::RawHtml },
-	serde::{ Serialize, Deserialize, json::Json },
 	form::Form,
 };
-//use rocket_contrib::databases::diesel;
+use rocket_contrib::databases::diesel::{ prelude::*, SqliteConnection, Connection };
 use std::ops::DerefMut;
 
-//#[database("sqlite_logs")]
-//struct LogsDbConn(diesel::SqliteConnection);
-
-#[derive(FromForm, Serialize, Deserialize)]
-struct Url {
-	#[field(validate=len(1..))]
-	url			: String,
-	shorten_url	: String,
-}
-
-impl Clone for Url {
-	fn clone(&self) -> Url {
-		Url {
-			url			: String::from(self.url.as_str()),
-			shorten_url	: String::from(self.url.as_str()),
-		}
-	}
-}
 
 #[get("/")]
-fn index() -> RawHtml<&'static str>{
+fn index() -> RawHtml<&'static str> {
 	RawHtml(include_str!("../index.html"))
 }
 
-fn to_shorter_url(node: &mut Url) -> &mut Url {
-	let end = node.url.rfind(".com").expect("Panic: Input is not a '.com' URL.") + 4;
+fn insert_url(conn: &SqliteConnection, url: Url) -> usize {
 
-	node.shorten_url = String::from(&node.url[0..=end]);
-	node
+	diesel::insert_into(urls::urls)
+		.values(&url)
+		.execute(conn)
+		.expect("Panic: Failed to save url in the database")
+}
+
+fn to_shorten_url(node: &mut GetUrl) -> Url {
+	let end	= node.url.rfind(".com").expect("Panic: Input is not a '.com' URL.") + 3;
+	Url::new(node.url.clone(), String::from(&node.url[0..=end]))
 }
 
 #[post("/", data = "<form>")]
-fn submit(mut form: Form<Url>) -> Json<Url> {
-	let url = to_shorter_url(form.deref_mut());
-	println!("{}", url.shorten_url);
-	Json((*url).clone())
+fn submit(mut form: Form<GetUrl>) -> RawHtml<&'static str> {
+	let url		= to_shorten_url(form.deref_mut());
+	let conn	= SqliteConnection::establish("/database/database.sqlite").expect("Panic: Could not connect to database");
+	insert_url(&conn, url);
+	RawHtml(include_str!("../index.html"))
 }
 
 #[launch]
 fn rocket() -> _ {
 	rocket::build()
-//		.attach(LogsDbConn::fairing())
 		.mount("/", routes![index, submit])
 }

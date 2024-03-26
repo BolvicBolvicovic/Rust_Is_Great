@@ -5,10 +5,10 @@
 	<script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="grid place-content-center gap-y-2 text-xl pt-40">
-	<form class="border-double border-4 bg-transparent rounded">
-		<input  type="text" id="base-url" placeholder="Write or paste URL..."></input>
+	<form action="" method="post">
+		<input  class="border-double border-4 bg-transparent rounded" type="text" name ="url" id="url" placeholder="Write or paste URL..."></input>
+		<button class="bg-slate-400 hover:bg-slate-500 p-1 rounded" value="submit" name="shorten">shorten!</button>
 	</form>
-	<button class="bg-slate-400 rounded" type="submit" id"shorten">shorten!</button>
 	<output class="bg-slate-200" type="text" id="output" placeholder="e.g. shortenURL.com"></output>
 </body>
 </html>
