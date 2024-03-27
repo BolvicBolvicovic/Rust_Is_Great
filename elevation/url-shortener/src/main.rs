@@ -4,6 +4,7 @@ mod url;
 
 use rusqlite::{ Connection };
 use url::{ Url, GetUrl };
+use std::collections::HashMap;
 use rocket::{
 	response::{ content::RawHtml },
 	form::Form,
@@ -11,9 +12,11 @@ use rocket::{
 use std::ops::DerefMut;
 
 fn insert_url(conn: &Connection, url: Url) {
+	let mut	hm_url = HashMap::new();
+	hm_url.insert(String::from(url.url.as_str()), String::from(url.shorten_url.as_str()));
 	conn.execute(
-		"INSERT INTO url (ulr, shorten_url) VALUES (?1, ?2)",
-		(&url.url, &url.shorten_url)
+		"INSERT INTO urls (url, shorten_url) VALUES (?1, ?2)",
+		&[&url.url, &url.shorten_url],
 	).expect("Panic: Could not insert data in database");
 }
 
@@ -29,7 +32,7 @@ fn index() -> RawHtml<&'static str> {
 
 #[post("/", data = "<form>")]
 fn submit(mut form: Form<GetUrl>) -> RawHtml<&'static str> {
-	let connection: rusqlite::Connection	= Connection::open_in_memory()
+	let connection: Connection	= Connection::open("./database/database.sqlite")
 		.expect("Panic: Could not open database");
 	let url		= to_shorten_url(form.deref_mut());
 	insert_url(&connection, url);
@@ -38,10 +41,10 @@ fn submit(mut form: Form<GetUrl>) -> RawHtml<&'static str> {
 
 #[launch]
 fn rocket() -> _ {
-	let connection: rusqlite::Connection	= Connection::open_in_memory()
+	let connection: Connection	= Connection::open("./database/database.sqlite")
 		.expect("Panic: Could not open database");
 	connection.execute(
-		"CREATE TABLE url (
+		"CREATE TABLE if not exists urls (
 			id			INTEGER PRIMERY KEY,
 			url			TEXT NOT NULL,
 			shorten_url TEXT NOT NULL
