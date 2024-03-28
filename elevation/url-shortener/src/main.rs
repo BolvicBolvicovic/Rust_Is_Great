@@ -1,11 +1,10 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 #[macro_use] extern crate rocket;
-#[macro_use] extern crate rocket_contrib;
 
 mod url;
 
-use rocket_contrib::databases::rusqlite::{ Connection };
+use rocket_sync_db_pools::{ database, rusqlite::Connection };
 use url::{ Url, GetUrl };
 use std::collections::HashMap;
 use rocket::{
@@ -39,7 +38,7 @@ fn index() -> RawHtml<&'static str> {
 #[post("/", data = "<form>")]
 fn submit(conn: DatabaseConnection, mut form: Form<GetUrl>) -> RawHtml<&'static str> {
 	let url		= to_shorten_url(form.deref_mut());
-	insert_url(&conn, url);
+	conn.run(|c| insert_url(c, url));
 	RawHtml(include_str!("../index.html"))
 }
 
