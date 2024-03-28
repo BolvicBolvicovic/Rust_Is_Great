@@ -1,7 +1,8 @@
-FROM	rust:1.49
+FROM	rust:1.70
 
 COPY	./ ./
 
+RUN		rustup override set nightly
 RUN		cargo build
 
-CMD		["./target/"]
+CMD		["cargo", "run"]
