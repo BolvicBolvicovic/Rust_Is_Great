@@ -32,14 +32,14 @@ fn to_shorten_url(node: &mut GetUrl) -> Url {
 
 #[get("/")]
 fn index() -> RawHtml<&'static str> {
-	RawHtml(include_str!("../index.html"))
+	RawHtml(include_str!("../html/index.html"))
 }
 
 #[post("/", data = "<form>")]
 fn submit(conn: DatabaseConnection, mut form: Form<GetUrl>) -> RawHtml<&'static str> {
 	let url		= to_shorten_url(form.deref_mut());
 	conn.run(|c| insert_url(c, url));
-	RawHtml(include_str!("../index.html"))
+	RawHtml(include_str!("../html/index.html"))
 }
 
 #[launch]
