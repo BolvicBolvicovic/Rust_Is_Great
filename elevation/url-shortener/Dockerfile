@@ -1,11 +1,11 @@
-FROM	rust:1.70
+FROM	rust:1.74
 
 COPY	./ ./
 
 RUN		rustup override set nightly
 RUN		cargo build
 
-ENV		PORT=8000
-EXPOSE	8000
+ENV		PORT=443
+EXPOSE	443
 
 CMD		["cargo", "run"]

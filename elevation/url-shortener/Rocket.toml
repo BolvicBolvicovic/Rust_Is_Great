@@ -7,7 +7,3 @@ port		= 443
 [default.tls]
 key			= "./tls/server_ca_key.pem"
 certs		= "./tls/server_ca.crt"
-
-[default.tls.mutual]
-ca_certs	= "./tls/server_ca_key.pem"
-mandatory	= true

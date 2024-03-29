@@ -21,7 +21,7 @@ fn insert_url(conn: &Connection, url: Url) {
 	hm_url.insert(String::from(url.url.as_str()), String::from(url.shorten_url.as_str()));
 	conn.execute(
 		"INSERT INTO urls (url, shorten_url) VALUES (?1, ?2)",
-		&[&url.url, &url.shorten_url],
+		[&url.url, &url.shorten_url],
 	).expect("Panic: Could not insert data in database");
 }
 
