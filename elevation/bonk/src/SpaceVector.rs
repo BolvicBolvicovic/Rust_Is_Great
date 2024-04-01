@@ -1,5 +1,7 @@
 #[derive(Debug)]
 
+const GRAVITY = 9.81;
+
 pub struct Speed {
     pub x: f32,
     pub y: f32,
@@ -24,6 +26,11 @@ impl SpaceVector {
         }
     }
 
+    fn get_acceleration(&self) -> const i32 {
+        const _acceleration = self.acceleration;
+        _acceleration
+    }
+
     fn set_acceleration(mut& self, n: i32) {
         if !self.is_static {
             self.acceleration = n;
@@ -40,14 +47,15 @@ impl SpaceVector {
     fn update_pos(mut& self) {
         if !self.is_static {
             self.x += self.speed.x;
-            self.y += self.speed.y;
+            self.y += self.speed.y - GRAVITY;
         }
     }
     
-    fn hit(&mut self, x_speed :f32, y_speed: f32) {
-        
-        #TODO
-
-        self.update_speed();
+    fn hit(&mut self, other: SpaceVector) {
+        if !self.is_static {
+            self.speed.x += other.speed.x;
+            self.speed.y += other.speed.y;
+            self.acceleration -= other.acceleration;
+        }
     }
 }

@@ -1,30 +1,36 @@
 use crates::SpaceVector::SpaceVector;
 
 pub struct Ball {
-	position	: SpaceVector,
-	ray			: u16,
-	has_shield	: bool,
-	grap		: Grap,
+	    position	: SpaceVector,
+	    ray			: u16,
+	    has_shield	: bool,
+	    grap		: Grap,
+    pub score       : u16,
+        name        : String,
 }
 
 impl Ball {
-    pub fn new(x: f32, y: f32, _ray: u16) -> Ball {
+    pub fn new(_name: String, x: f32, y: f32, _ray: u16) -> Ball {
         Ball {
             position    : SpaceVector::new(x, y, false),
             ray         : _ray,
             has_shield  : false,
             grap        : Grap::new(),
+            score       : 0,
+            name        : _name;
         }
     }
 
-    fn move(&mut self, hit: bool, x_speed: f32, y_speed: f32, acceleration: u16) {
+    fn move(&mut self, hit: bool, other: SpaceVector) {
         if hit {
-            self.position.hit(x_speed, y_speed, acceleration);
+            self.position.hit(other);
         } else {
-            self.position.set_acceleration(acceleration);
+            self.position.set_acceleration(other.get_acceleration());
             self.position.update_speed();
         }
-        self.position.update_pos();
+        if !self.position.is_static {
+            self.position.update_pos();
+        }
     }
 }
 
