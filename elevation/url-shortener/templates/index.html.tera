@@ -9,5 +9,13 @@
 		<input  class="border-double border-4 bg-transparent rounded" type="text" name ="url" id="url" placeholder="Write or paste URL..."></input>
 		<button class="bg-slate-400 hover:bg-slate-500 p-1 rounded" value="submit" name="shorten">shorten!</button>
 	</form>
+	<div class="grid grid-col-2 bg-slate-200 pl-2 flex space-y-2 rounded">
+		{% for url in urls %}
+		<pr class="flex justify-between">
+			<p href="{{ url.url }}">{{ url.shorten_url }}</p>
+			<button class="bg-slate-400 hover:bg-slate-500 px-8 rounded" action="" method="post">delete</button>
+		</pr>
+		{% endfor %}
+	</div>
 </body>
 </html>

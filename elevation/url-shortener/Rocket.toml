@@ -3,7 +3,3 @@ sqlite_db	= { url = "./database/database.sqlite" }
 
 [default]
 port		= 8000
-
-[default.tls]
-key			= "./tls/key_sec1.der"
-certs		= "./tls/cert.der"
