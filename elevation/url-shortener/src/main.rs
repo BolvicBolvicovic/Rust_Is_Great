@@ -37,16 +37,16 @@ fn to_shorten_url(node: &mut GetUrl) -> Url {
             8
             },
     };
-	let end	= match node.url.rfind(".com") {
-        Some(end)   => end + 3,
-        None        => match node.url.rfind(".fr") {
-            Some(end)   => end + 2,
-            None        => match node.url.rfind(".org") {
-				Some(end)	=> end + 3,
-				None		=> {
-                	node.url.push_str(".com");
-                	node.url.rfind(".com").unwrap() + 3
-            	},
+	let end	= match node.url[start..].find(".com") {
+        Some(end)   => start + end + 4,
+        None        => match node.url[start..].find(".fr") {
+            Some(end)   => start + end + 3,
+            None        => match node.url[start..].find(".org") {
+				Some(end)	=> start + end + 4,
+				None		=> match node.url[start..].find("/") {
+					Some(end)	=> start + end - 1,
+					None		=> node.url.len() - 1,
+				}
 			}
         }
     };
