@@ -41,10 +41,13 @@ fn to_shorten_url(node: &mut GetUrl) -> Url {
         Some(end)   => end + 3,
         None        => match node.url.rfind(".fr") {
             Some(end)   => end + 2,
-            None        => {
-                node.url.push_str(".com");
-                node.url.rfind(".com").unwrap() + 3
-            },
+            None        => match node.url.rfind(".org") {
+				Some(end)	=> end + 3,
+				None		=> {
+                	node.url.push_str(".com");
+                	node.url.rfind(".com").unwrap() + 3
+            	},
+			}
         }
     };
 	Url::new(node.url.clone(), String::from(&node.url[start..=end]))
