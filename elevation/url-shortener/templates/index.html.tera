@@ -14,7 +14,7 @@
 		{% for url in urls %}
 		<form action="/delete/{{ url.shorten_url }}" method="post" class="flex justify-between bg-slate-200 rounded" name="{{ url.shorten_url }}">
 			<input type="hidden" name="_method" value="delete"/>
-			<a href="{{ url.url }}">{{ url.shorten_url }}</a>
+			<a href="{{ url.url }}" target="_blank">{{ url.shorten_url }}</a>
 			<button type="submit" class="bg-slate-400 hover:bg-slate-500 px-8 rounded">delete</button>
 		</form>
 		{% endfor %}
