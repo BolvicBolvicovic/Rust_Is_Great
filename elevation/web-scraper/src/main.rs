@@ -28,9 +28,8 @@ impl Query {
 async fn download(image: String, img_num: usize, path: String, client: Client) -> Result<(), Box<dyn std::error::Error>> {
     let response = async move {
         let future = client.get(image).send().await?;
-        future.text().await
+        future.bytes().await
     }.await?;
-    println!("{}", response);
     let name = format!("{}image{}.png", path, img_num); 
     let filename = Path::new(name.as_str())
         .file_name()
@@ -38,7 +37,7 @@ async fn download(image: String, img_num: usize, path: String, client: Client) -
         .unwrap();
 
     let mut file = File::create(filename)?;
-    file.write_all(response.as_bytes())?;
+    file.write_all(&response)?;
     Ok(())
 }
 
