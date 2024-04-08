@@ -25,17 +25,16 @@ impl Query {
 }
 
 
-async fn download(image: String, img_num: usize, path: String, client: Client) -> Result<(), Box<dyn std::error::Error>> {
+async fn download(image: String, r#type: &str, img_num: usize, path: String, client: Client) -> Result<(), Box<dyn std::error::Error>> {
     let response = async move {
         let future = client.get(image).send().await?;
         future.bytes().await
     }.await?;
-    let name = format!("{}image{}.png", path, img_num); 
-    let filename = Path::new(name.as_str())
-        .file_name()
-        .and_then(|s| s.to_str())
-        .unwrap();
-
+    let name = format!("{path}image{img_num}{type}"); 
+    let filename = Path::new(name.as_str());
+    if !Path::new(path.as_str()).exists() {
+        std::fs::create_dir(path.as_str())?;
+    }
     let mut file = File::create(filename)?;
     file.write_all(&response)?;
     Ok(())
@@ -121,14 +120,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
         };
     }
     if !query.r_flag {
-        download(String::from(images[0].as_str()), 0, query.p_flag, client.clone()).await?;
+        let mut r#type = &images[0][(if let Some(index) = images[0].rfind(".") {index} else {0})..];
+        if r#type == images[0] {
+            r#type = ".png";
+        }
+        download(String::from(images[0].as_str()), r#type, 0, query.p_flag, client.clone()).await?;
+        println!("{} {}", "Downloaded:".blue(), images[0]);
     } else {
         let mut i: usize = 0;
         for img in images {
             if i == query.l_flag {
                 break;
             }
-            download(String::from(img.as_str()), i, String::from(query.p_flag.as_str()), client.clone()).await?;
+            let mut r#type = &img[(if let Some(index) = img.rfind(".") {index} else {0})..];
+            if r#type == img {
+                r#type = ".png";
+            }
+            download(String::from(img.as_str()), r#type, i, String::from(query.p_flag.as_str()), client.clone()).await?;
             println!("{} {}", "Downloaded:".blue(), img);
             i += 1;
         }
