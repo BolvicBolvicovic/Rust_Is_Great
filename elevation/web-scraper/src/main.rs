@@ -119,6 +119,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
             Err(e)      => eprintln!("{} {}", "Error:".red(), e),
         };
     }
+    if images.len() <= 0 {
+        eprintln!("{}", "No image found".red());
+        return Ok(());
+    }
     if !query.r_flag {
         let mut r#type = &images[0][(if let Some(index) = images[0].rfind(".") {index} else {0})..];
         if r#type == images[0] {
